@@ -8,9 +8,12 @@ var rdnMute = true; // Getting randomly muted on (false = off/true = on)
 var userConnected = []; // Empty at the begenning, but should initiate like the nbrDansVoiceChannel
 var minSec = 1.2e+6; // Minimum between each mute and this is like 20 minute in millisecond
 var maxSec = 3.6e+6; // Maximun between each mute and this is like 1 hour in millisecond
+var userNeeded = 2; // User needed for the mute
 
 bot.on("ready", () =>{
-    console.log("I am ready!\n\n\n"); //Just to be sure
+    console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"+//clear the console
+    "__________________________________________________________");//put a lign to separe different try
+    console.log("I am ready!\n\n"); //Just to be sure
 });
 
 bot.on("message" , message => {
@@ -24,16 +27,18 @@ bot.on("message" , message => {
 
     //Wall of text for the commands
     if(command === "help" || command === "commands" || command ==="command"){
-        message.reply(  '\n~say sentence                        Make me say something                                        '+ 
-                        '\n~gay                                 Say to everybody online that you are gay                     '+ 
-                        '\n~random number                       Random number between 0 and the number wrote                 '+ 
-                        '\n~avatar somebody                     A url for his/her/it avatar                                  '+
-                        '\n~REEEE                               REEEEE GET THE FUCK OUT OF MY CHANNEL                        '+
-                        '\n~cat                                 Random image of a cat                                        '+
-                        '\n~rdnMute On/Off                      Set the random mute on/off                                   '+
-                        '\n~timeMute seconds(max 120)           Number of seconds for the random mute                        '+
-                        '\n~interval min(sec) max(sec)          Number of seconds between each random mute                   '+ 
-                        '\n~help or ~commands                   I show you all my commands                                   ');
+        message.reply(  '\n~say sentence                        Make me say something'+ 
+                        '\n~gay                                 Say to everybody online that you are gay'+ 
+                        '\n~random number                       Random number between 0 and the number wrote'+ 
+                        '\n~avatar somebody                     A url for his/her/it avatar'+
+                        '\n~REEEE                               REEEEE GET THE FUCK OUT OF MY CHANNEL'+
+                        '\n~cat                                 Random image of a cat'+
+                        '\n~rdnMute On/Off                      Set the random mute on/off'+
+                        '\n~timeMute seconds(max 120)           Number of seconds for the random mute'+
+                        '\n~interval min(sec) max(sec)          Number of seconds between each random mute'+
+                        '\n~setNumber                           Set the number of user needed for a random mute'+
+                        '\n~stat                                Important stat for a mute'+ 
+                        '\n~help or ~commands                   I show you all my commands');
     } else
 
     // Make the bot say something, need more work(ex. Deleting the message with the ~say)
@@ -136,16 +141,32 @@ bot.on("message" , message => {
                 minSec = (args[0]*1000);//The *1000 is to put it in millisecond
                 maxSec = (args[1]*1000);//Same here
             }
-        }/*else 
+        }else
+
+        // Let the users set the number of user needed for a random mute
+        if(command === "setNumber" || command === "setnumber" || command === "SetNumber" || command === "Setnumber"){
+        if(isNaN(args)){
+            message.reply("Must be a number, slowpoke!");
+        } else
+
+        if(args >= message.guild.memberCount){
+            message.reply("Not enought user in your server, fking pleb");
+            }
+        else{
+             userNeeded = (args);
+             message.reply("You should have at least "+ userNeeded+" to have a random mute");
+            }
+        } else 
         
-        //Hidden command that only shows things in the console soooo...
+        //stats for the random mute
         if (command === "stat"){
-                for(var i = 0; i <= userConnected.length-1 ; i++){
-                    console.log(userConnected.length+" "+i);
-                    console.log(userConnected[i]+" is already connected");
-                }
-                    console.log(nbrDansVoiceChannel);
-    }*/
+                message.reply(  "\n Users connected to the voice chat : " + nbrDansVoiceChannel +
+                                "\n Minimum of seconds before the next random mute : " + minSec*1000 + 
+                                "\n Maximum of seconds before the next random mute : " + maxSec*1000 + 
+                                "\n The random mute is on : " + rdnMute + 
+                                "\n Duration of the next random mute : " + (timeMuted/1000) +
+                                "\n Number of user needed for a random mute : " + userNeeded);
+    }
 
     else{
         message.reply("You might want to use ~help next time");
@@ -166,7 +187,7 @@ bot.on("voiceStateUpdate", function(newMember, oldMember) {
                     }
 
                     console.log(newMember.user + " aka " + newMember.user.username +" disconnected from " +
-                    newMember.voiceChannel.name);
+                    newMember.voiceChannel.name + " the " + getDateTime());
 
                     userConnected = userConnected.filter(checkUser);
                 
@@ -179,7 +200,8 @@ bot.on("voiceStateUpdate", function(newMember, oldMember) {
         //If i don't do this being muted call the update back
         else if(!newMember.mute){
             nbrDansVoiceChannel++;
-            console.log(newMember.user+" just connected aka " + newMember.user.username);
+
+            console.log(newMember.user+" aka " + newMember.user.username + "joined " + newMember.guild.name + " the " + getDateTime());
             
             userConnected.push(newMember.user);
 
@@ -212,6 +234,30 @@ bot.on("voiceStateUpdate", function(newMember, oldMember) {
 function randomIntFromInterval(min,max)
 {
     return Math.floor(Math.random()*(max-min+1)+min);
+}
+function getDateTime() {
+
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+
+    return year + ":" + month + ":" + day + " at " + hour + ":" + min + ":" + sec;
+
 }
 
 bot.login('MjYyNDIwMTIyMTkzMzYyOTQ0.C0DNTA.pGAmqcgo363ol9l9BkeI6tzl7Uo');
